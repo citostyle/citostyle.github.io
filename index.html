@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jürgen Cito</title>
+<meta name="description" content="Jürgen Cito, University Professor at TU Wien. I lead the Interactive Programming &amp; Analysis Lab.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+/* Fonts are self-hosted (fonts/, SIL Open Font License), so visitors' browsers never contact a third party. */
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 500; font-display: swap; src: url("fonts/ibm-plex-mono-latin-500-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/ibm-plex-mono-latin-ext-400-normal.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 500; font-display: swap; src: url("fonts/ibm-plex-mono-latin-ext-500-normal.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+/* Layout: the whole site is one terminal window, centred, with its own dark/light switch and a live prompt.
+   The terminal's look is chosen by the visitor's toggle, not by the host theme. */
+:root {
+  --page: #0A141B;
+  --term-bg: #0D1B24;
+  --term-bar: #15262F;
+  --fg: #D9E4EA;
+  --dim: #7E95A3;
+  --rule: #23363F;
+  --acc: #6CC4F0;
+  --yel: #F2B33D;
+  --grn: #8FD19E;
+  --red: #F08A7E;
+  --hover: #132733;
+  --shadow: rgb(0 0 0 / .45);
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+:root[data-term="light"] {
+  --page: #E6EAEA;
+  --term-bg: #FAFAF7;
+  --term-bar: #EEF0EE;
+  --fg: #0E1116;
+  --dim: #5B6470;
+  --rule: #DCDFE3;
+  --acc: #006699;
+  --yel: #A86F00;
+  --grn: #2D7A47;
+  --red: #B3261E;
+  --hover: #EEF3F5;
+  --shadow: rgb(0 0 0 / .12);
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { background: var(--page); }
+html { -webkit-text-size-adjust: 100%; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; }
+body { color: var(--fg); font: 400 15px/1.7 var(--mono); -webkit-font-smoothing: antialiased; transition: background-color .2s; }
+p, table, pre, h1, ul { margin: 0; padding: 0; }
+ul { list-style: none; }
+a { color: var(--acc); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--yel); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+.page {
+  max-width: 900px; margin: 0 auto;
+  padding-block: clamp(20px, 6vh, 64px) 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 14px;
+}
+
+.term { background: var(--term-bg); border-radius: 10px; overflow: hidden; box-shadow: 0 18px 50px var(--shadow); border: 1px solid var(--rule); container-type: inline-size; }
+.tbar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; padding: 8px 10px 8px 14px; background: var(--term-bar); border-bottom: 1px solid var(--rule); font-size: 12px; color: var(--dim); }
+.dots { display: flex; gap: 7px; }
+.dots i { width: 11px; height: 11px; border-radius: 50%; background: var(--rule); }
+.tbar .title { text-align: center; white-space: nowrap; }
+.mode { justify-self: end; font: inherit; color: var(--dim); background: transparent; border: 1px solid var(--rule); border-radius: 4px; padding: 2px 8px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+.mode:hover { color: var(--fg); border-color: var(--dim); }
+.mode .sw { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid currentColor; background: linear-gradient(90deg, currentColor 50%, transparent 50%); }
+
+.body { padding: 22px clamp(16px, 4cqi, 34px) 28px; display: grid; gap: 4px; cursor: text; }
+.body > *, #screen > * { min-width: 0; }
+.cmd { color: var(--fg); overflow-wrap: anywhere; }
+.ps { color: var(--grn); white-space: nowrap; }
+.ps i { color: var(--acc); font-style: normal; }
+.cmd b { font-weight: 500; }
+.out { margin-bottom: 16px; max-width: 68ch; overflow-wrap: anywhere; cursor: auto; }
+.out.pre { white-space: pre-wrap; }
+.who { font-size: 20px; font-weight: 500; line-height: 1.4; }
+.k { color: var(--dim); }
+.err { color: var(--red); }
+.y { color: var(--yel); }
+.g { color: var(--grn); }
+
+table { border-collapse: collapse; }
+td { padding: 0; vertical-align: top; }
+.ls td { padding-right: 2ch; white-space: nowrap; }
+.ls td:last-child { padding-right: 0; white-space: normal; overflow-wrap: anywhere; }
+.perm { color: var(--dim); font-size: 13px; }
+@container (max-width: 560px) { .perm { display: none; } }
+.cols { display: flex; flex-wrap: wrap; gap: 0 2.4ch; }
+.dir { color: var(--acc); font-weight: 500; }
+.dot { color: var(--dim); }
+.help td:first-child { padding-right: 2ch; white-space: nowrap; color: var(--acc); }
+
+/* git log: smaller than the rest, each line opens its commit */
+.small { font-size: 13px; line-height: 1.75; }
+.log { display: grid; }
+.commit-btn { all: unset; box-sizing: border-box; display: grid; grid-template-columns: auto 1fr auto; gap: 0 1.6ch; cursor: pointer; padding: 1px 6px; margin: 0 -6px; border-radius: 4px; width: calc(100% + 12px); }
+.commit-btn:hover, .commit-btn[aria-expanded="true"] { background: var(--hover); }
+.commit-btn:focus-visible { outline: 2px solid var(--yel); outline-offset: 0; }
+.sha { color: var(--yel); }
+.ref { color: var(--grn); }
+.msg { color: var(--dim); min-width: 0; }
+.commit-btn:hover .msg, .commit-btn[aria-expanded="true"] .msg { color: var(--fg); }
+.chev { color: var(--dim); }
+.commit-btn[aria-expanded="true"] .chev { color: var(--yel); }
+.hint { color: var(--dim); font-size: 12px; margin-top: 4px; }
+
+.show { margin: 6px 0 12px; padding: 12px 0 14px 2ch; border-left: 2px solid var(--rule); font-size: 13.5px; line-height: 1.7; display: grid; gap: 10px; }
+.show.flat { margin-top: 0; }
+.show .head { color: var(--dim); }
+.show .head .sha { font-weight: 500; }
+.show .subject { color: var(--fg); font-weight: 500; padding-left: 4ch; }
+.show .text { padding-left: 4ch; max-width: 68ch; }
+.show .papers { padding-left: 4ch; display: grid; gap: 2px; }
+.show .papers li { padding-left: 2ch; text-indent: -2ch; }
+
+/* live prompt */
+.prompt { display: flex; align-items: baseline; gap: 1ch; flex-wrap: nowrap; }
+.prompt input { flex: 1; min-width: 4ch; font: inherit; color: var(--fg); background: transparent; border: 0; padding: 0; caret-color: var(--yel); outline: none; }
+.prompt input:focus-visible { outline: none; }
+@media (pointer: coarse) { .prompt input { font-size: 16px; } }
+.started { color: var(--dim); font-size: 12px; }
+.started b { color: var(--yel); font-weight: 400; }
+
+.note { color: var(--dim); font-size: 12px; line-height: 1.6; max-width: 80ch; }
+.note b { color: var(--yel); font-weight: 400; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="term">
+    <div class="tbar">
+      <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="title">jcito — zsh</span>
+      <button class="mode" id="mode" type="button" aria-label="Switch to light mode"><span class="sw" aria-hidden="true"></span><span id="mode-label">light</span></button>
+    </div>
+    <main class="body" id="body">
+      <div id="screen" aria-live="polite">
+        <noscript>
+          <h1 class="out who">Jürgen Cito, University Professor at TU Wien</h1>
+          <p class="out">I lead the <a href="https://ipa-lab.github.io/">Interactive Programming &amp; Analysis Lab</a>. We study how developers and AI agents understand, debug and repair software.</p>
+          <p class="out"><a href="https://dblp.org/pid/150/6416.html">dblp</a> · <a href="https://github.com/citostyle">github</a> · juergen.cito@tuwien.ac.at</p>
+          <p class="out small k">Previously: Visiting Faculty Researcher, Google DevAI · Research Scientist, Meta · Postdoc, MIT · PhD, University of Zurich</p>
+        </noscript>
+      </div>
+      <form class="prompt cmd" id="prompt" autocomplete="off">
+        <label class="ps" for="cli">jcito@<i>tuwien</i> ~ %</label>
+        <input id="cli" type="text" spellcheck="false" autocapitalize="off" autocorrect="off" enterkeyhint="go" aria-label="Type a command, or help">
+      </form>
+      <p class="started">type <b>help</b> · tab completes · ↑ ↓ history</p>
+    </main>
+  </div>
+</div>
+
+<script>
+(function () {
+  // ================= Content: edit here =================
+  var LINKS = [
+    ['lab', 'ipa-lab.github.io', 'https://ipa-lab.github.io/'],
+    ['dblp', 'dblp.org/pid/150/6416', 'https://dblp.org/pid/150/6416.html'],
+    ['github', 'github.com/citostyle', 'https://github.com/citostyle']
+  ];
+  var MAIL = 'juergen.cito@tuwien.ac.at';
+  var ABOUT = 'I lead the Interactive Programming & Analysis Lab. We study how developers and AI agents understand, debug and repair software.';
+  var PLAN = 'Currently: figuring out when we can trust AI agents that change our code.\nAlso: answering email. Slowly.';
+
+  // Newest first. `old: true` commits only show with `git log --all`.
+  var COMMITS = [
+    { sha: 'a2f90c4', ref: '(HEAD -> tu-wien)', subject: 'University Professor, TU Wien',
+      text: 'Lead the Interactive Programming & Analysis Lab. Current threads: AI agents for program repair, LLMs and offensive security, probabilistic programming, and grammar inference.',
+      papers: [
+        ['Getting pwn’d by AI: Penetration Testing with Large Language Models', 'FSE 2023', 'https://doi.org/10.1145/3611643.3613083'],
+        ['Static Inference of Regular Grammars for Ad Hoc Parsers', 'OOPSLA 2025', 'https://doi.org/10.1145/3763054'],
+        ['all publications →', '', 'https://ipa-lab.github.io/publications/']
+      ] },
+    { sha: 'e4d1a07', subject: 'Visiting Faculty Researcher, Google DevAI',
+      text: 'Worked with the DevAI team on evaluating LLM-based agents that fix real bugs in Google’s codebase.',
+      papers: [
+        ['Evaluating Agent-Based Program Repair at Google', 'ICSE SEIP 2025', 'https://doi.org/10.1109/ICSE-SEIP66354.2025.00038']
+      ] },
+    { sha: '9b3c2f1', subject: 'Research Scientist, Meta (Probability)',
+      text: 'Worked on predicting performance regressions in production and on explaining what models of code and other ML models get wrong.',
+      papers: [
+        ['Learning to Learn to Predict Performance Regressions in Production at Meta', 'AST 2023', 'https://doi.org/10.1109/AST58925.2023.00010'],
+        ['Explaining Mispredictions of Machine Learning Models Using Rule Induction', 'FSE 2021', 'https://doi.org/10.1145/3468264.3468614'],
+        ['Counterfactual Explanations for Models of Code', 'ICSE SEIP 2022', 'https://dblp.org/search?q=Counterfactual+Explanations+for+Models+of+Code']
+      ] },
+    { sha: '51a8e6d', subject: 'Postdoc, MIT',
+      text: 'Worked on AutoML, collaborative data science, and how developers use automatically generated patches.',
+      papers: [
+        ['AMS: Generating AutoML Search Spaces from Weak Specifications', 'FSE 2020', 'https://doi.org/10.1145/3368089.3409700'],
+        ['Enabling Collaborative Data Science Development with the Ballet Framework', 'CSCW 2021', 'https://doi.org/10.1145/3479575'],
+        ['Characterizing Developer Use of Automatically Generated Patches', 'VL/HCC 2019', 'https://doi.org/10.1109/VLHCC.2019.8818884']
+      ] },
+    { sha: '0c7f3b2', subject: 'PhD, University of Zurich',
+      text: 'Thesis on software runtime analytics for developers: bringing production performance data into the IDE so developers see how their code behaves at runtime.',
+      papers: [
+        ['Interactive Production Performance Feedback in the IDE', 'ICSE 2019', 'https://doi.org/10.1109/ICSE.2019.00102'],
+        ['Context-Based Analytics: Establishing Explicit Links between Runtime Traces and Source Code', 'ICSE SEIP 2017', 'https://doi.org/10.1109/ICSE-SEIP.2017.1'],
+        ['The Making of Cloud Applications: An Empirical Study on Software Development for the Cloud', 'FSE 2015', 'https://doi.org/10.1145/2786805.2786826'],
+        ['PhD thesis (ZORA)', '2018', 'https://www.zora.uzh.ch/id/eprint/152966/']
+      ] },
+    { sha: 'b4dc0de', old: true, subject: 'Discover that programs can be wrong',
+      text: 'Spent the rest of my career on it.' },
+    { sha: '0000000', old: true, subject: 'Initial commit',
+      text: 'Hello, world.' }
+  ];
+  // =======================================================
+
+  var screen = document.getElementById('screen');
+  var form = document.getElementById('prompt');
+  var input = document.getElementById('cli');
+  var body = document.getElementById('body');
+  var uid = 0;
+  var hist = [];
+  var hpos = 0;
+
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function link(text, href) { var a = el('a', null, text); a.href = href; if (/^https?:/.test(href)) { a.target = '_blank'; a.rel = 'noopener'; } return a; }
+  function line(cls, text) { return el('p', 'out ' + (cls || ''), text); }
+  function ps() { var s = el('span', 'ps'); s.append('jcito@', el('i', null, 'tuwien'), ' ~ %'); return s; }
+  function echo(cmd, small) { var p = el('p', 'cmd' + (small ? ' small' : '')); p.append(ps(), ' ', el('b', null, cmd)); screen.append(p); }
+  function find(sha) { sha = (sha || '').toLowerCase(); if (sha === 'head') return COMMITS[0]; return COMMITS.filter(function (c) { return sha.length >= 4 && c.sha.indexOf(sha) === 0; })[0]; }
+
+  function buildShow(c) {
+    var box = el('div', 'show');
+    var head = el('p', 'head');
+    head.append('commit ', el('span', 'sha', c.sha));
+    if (c.ref) head.append(' ', el('span', 'ref', c.ref));
+    head.append(document.createElement('br'), 'Author: Jürgen Cito');
+    box.append(head, el('p', 'subject', c.subject), el('p', 'text', c.text));
+    if (c.papers) {
+      var ul = el('ul', 'papers');
+      c.papers.forEach(function (x) {
+        var li = el('li'); li.append('- ', link(x[0], x[2]));
+        if (x[1]) li.append(el('span', 'k', ' (' + x[1] + ')'));
+        ul.append(li);
+      });
+      box.append(ul);
+    }
+    return box;
+  }
+
+  function logBlock(all) {
+    var wrap = el('div', 'log small out');
+    COMMITS.forEach(function (c) {
+      if (c.old && !all) return;
+      var id = 'show-' + c.sha + '-' + (++uid);
+      var b = el('button', 'commit-btn'); b.type = 'button';
+      b.dataset.sha = c.sha;
+      b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-controls', id);
+      var msg = el('span', 'msg'); if (c.ref) msg.append(el('span', 'ref', c.ref), ' '); msg.append(c.subject);
+      b.append(el('span', 'sha', c.sha), msg, el('span', 'chev', '+'));
+      var show = buildShow(c); show.id = id; show.hidden = true;
+      b.addEventListener('click', function () { toggle(b, show); });
+      wrap.append(b, show);
+    });
+    if (!all) { var more = el('p', 'hint'); more.append('select a commit to see more · older history: ', el('span', 'y', 'git log --all')); wrap.append(more); }
+    return wrap;
+  }
+  function toggle(b, show, force, quiet) {
+    var open = force != null ? force : b.getAttribute('aria-expanded') !== 'true';
+    b.setAttribute('aria-expanded', String(open));
+    b.querySelector('.chev').textContent = open ? '−' : '+';
+    show.hidden = !open;
+    if (!quiet) { try { history.replaceState(null, '', open ? '#' + b.dataset.sha : location.pathname + location.search); } catch (e) {} }
+  }
+
+  function lsLong() {
+    var t = el('table', 'out ls');
+    LINKS.forEach(function (l) {
+      var tr = el('tr'); tr.append(el('td', 'perm', 'lrwxr-xr-x'), el('td', null, l[0]), el('td', 'k', '->'));
+      var td = el('td'); td.append(link(l[1], l[2])); tr.append(td); t.append(tr);
+    });
+    var tr = el('tr'); tr.append(el('td', 'perm', '-rw-r--r--'), el('td', null, 'mail'), el('td', 'k', ''), el('td', 'k', MAIL)); t.append(tr);
+    return t;
+  }
+  function cols(items) {
+    var p = el('p', 'out cols');
+    items.forEach(function (x) { p.append(typeof x === 'string' ? el('span', null, x) : x); });
+    return p;
+  }
+
+  var FILES = { 'about.txt': ABOUT, '.plan': PLAN, 'mail': MAIL };
+
+  var CMDS = {
+    help: function () {
+      var t = el('table', 'out help small');
+      [['whoami', 'who is this'], ['cat about.txt', 'what I work on'], ['ls [-la] [links/]', 'list things'], ['open <link>', 'open ' + LINKS.map(function (l) { return l[0]; }).join(', ')],
+       ['git log [--all]', 'career, newest first'], ['git show <sha>', 'one commit in detail'], ['theme light|dark', 'switch colours'], ['clear', 'clear the screen']]
+        .forEach(function (r) { var tr = el('tr'); tr.append(el('td', null, r[0]), el('td', 'k', r[1])); t.append(tr); });
+      var p = line('k small', 'There may be a few more.');
+      return [t, p];
+    },
+    whoami: function () { var h = el('h1', 'out who', 'Jürgen Cito, University Professor at TU Wien'); return h; },
+    pwd: function () { return line('', '/home/jcito'); },
+    date: function () { return line('', new Date().toString().replace(/\s\(.*\)$/, '')); },
+    echo: function (a) { return line('', a.join(' ')); },
+    ls: function (a) {
+      var flags = a.filter(function (x) { return x[0] === '-'; }).join('');
+      var target = a.filter(function (x) { return x[0] !== '-'; })[0];
+      if (target && /^links\/?$/.test(target)) return /l/.test(flags) ? lsLong() : cols(LINKS.map(function (l) { return link(l[0], l[2]); }));
+      if (target) return line('err', 'ls: ' + target + ': No such file or directory');
+      var items = [el('span', 'dir', 'links/'), 'about.txt', 'mail'];
+      if (/a/.test(flags)) items = [el('span', 'dot', '.'), el('span', 'dot', '..'), el('span', 'dot', '.plan')].concat(items);
+      return cols(items);
+    },
+    cat: function (a) {
+      if (!a.length) return line('k', 'cat: waiting for a file name (try about.txt)');
+      return a.map(function (f) {
+        if (FILES[f] != null) return line('pre', FILES[f]);
+        if (/^links\/?$/.test(f)) return line('err', 'cat: links: Is a directory');
+        if (f === '/etc/passwd') return line('err', 'cat: nice try.');
+        return line('err', 'cat: ' + f + ': No such file or directory');
+      });
+    },
+    cd: function (a) {
+      if (!a.length || a[0] === '~') return null;
+      if (/^links\/?$/.test(a[0])) return line('k', 'cd: those are symlinks to other sites. try: open ' + LINKS[0][0]);
+      if (a[0] === '..') return line('k', 'cd: there is nothing above home.');
+      return line('err', 'cd: no such file or directory: ' + a[0]);
+    },
+    open: function (a) {
+      var name = (a[0] || '').replace(/^links\//, '');
+      var l = LINKS.filter(function (x) { return x[0] === name; })[0];
+      if (!l) return line('err', 'open: unknown link' + (name ? ' "' + name + '"' : '') + '. options: ' + LINKS.map(function (x) { return x[0]; }).join(', '));
+      var p = line(''); p.append('opening ', link(l[1], l[2]), ' ↗');
+      return p;
+    },
+    git: function (a) {
+      var sub = a[0];
+      if (sub === 'log') { return logBlock(a.indexOf('--all') !== -1 || a.indexOf('--reverse') !== -1); }
+      if (sub === 'show') {
+        var c = find(a[1] || 'HEAD');
+        if (!c) return line('err', 'fatal: bad object ' + a[1] + '. try git log');
+        var s = buildShow(c); s.classList.add('out', 'flat'); return s;
+      }
+      if (sub === 'status') return line('pre', 'On branch tu-wien\nnothing to commit, working tree clean');
+      if (sub === 'blame') return line('k', 'it was the config file. it is always the config file.');
+      if (sub === 'push' && a.indexOf('--force') !== -1) return line('err', 'remote: rejected. we don’t do that here.');
+      if (sub === 'commit') return line('k', 'nothing to commit. working on it.');
+      if (!sub) return line('k', 'usage: git log | git show <sha> | git status');
+      return line('err', 'git: ‘' + sub + '’ is not a git command here. try git log');
+    },
+    theme: function (a) {
+      var m = a[0] === 'light' || a[0] === 'dark' ? a[0] : (document.documentElement.getAttribute('data-term') === 'light' ? 'dark' : 'light');
+      setMode(m, true); return line('k', 'theme: ' + m);
+    },
+    sudo: function () { return line('err', 'jcito is not in the sudoers file. This incident will be reported.'); },
+    rm: function () { return line('err', 'rm: permission denied. the papers are staying.'); },
+    exit: function () { return line('k', 'logout? from your own homepage? there is a browser tab for that.'); },
+    vim: function () { return line('k', 'you are now in vim. good luck getting out. (just kidding: type anything.)'); },
+    emacs: function () { return line('k', 'emacs: loading... still loading... try vim?'); },
+    man: function (a) {
+      if (a[0] !== 'jcito') return line('k', 'What manual page do you want? try man jcito');
+      return line('pre', 'JCITO(1)\n\nNAME\n    jcito – Jürgen Cito, University Professor at TU Wien\n\nSEE ALSO\n    whoami, git log, open lab');
+    },
+    history: function () { return line('pre small', hist.map(function (h, i) { return String(i + 1).padStart(4) + '  ' + h; }).join('\n') || '(empty)'); },
+    clear: function () { screen.textContent = ''; return null; }
+  };
+  CMDS.ll = function () { return CMDS.ls(['-la']); };
+  CMDS.nano = CMDS.vim; CMDS.vi = CMDS.vim;
+  CMDS.logout = CMDS.exit;
+  CMDS.make = function (a) { return a.join(' ') === 'coffee' ? line('k', 'make: *** No rule to make target ‘coffee’. Try the TU Wien Mensa.') : line('err', 'make: *** No targets specified.'); };
+  CMDS.hello = CMDS.hi = function () { return line('', 'hi! type help to look around.'); };
+
+  function run(raw, opts) {
+    opts = opts || {};
+    var parts = raw.trim().split(/\s+/);
+    var name = parts[0].toLowerCase();
+    var args = parts.slice(1);
+    if (!opts.silentEcho) echo(raw, name === 'git' && args[0] === 'log');
+    var fn = CMDS[name];
+    var out = fn ? fn(args) : line('err', 'zsh: command not found: ' + name + '. try help');
+    if (out == null) return;
+    (Array.isArray(out) ? out : [out]).forEach(function (n) { screen.append(n); });
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var raw = input.value;
+    input.value = '';
+    if (!raw.trim()) { echo(''); return; }
+    hist.push(raw); hpos = hist.length;
+    run(raw);
+    input.scrollIntoView({ block: 'nearest' });
+  });
+
+  var COMPLETE = Object.keys(CMDS).concat(['git log', 'git log --all', 'git show', 'git status', 'cat about.txt', 'cat .plan', 'ls links/', 'ls -la', 'theme light', 'theme dark', 'man jcito']);
+  COMMITS.forEach(function (c) { COMPLETE.push('git show ' + c.sha); });
+  LINKS.forEach(function (l) { COMPLETE.push('open ' + l[0]); });
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowUp') { if (hpos > 0) { hpos--; input.value = hist[hpos]; } e.preventDefault(); }
+    else if (e.key === 'ArrowDown') { if (hpos < hist.length - 1) { hpos++; input.value = hist[hpos]; } else { hpos = hist.length; input.value = ''; } e.preventDefault(); }
+    else if (e.key === 'Tab') {
+      var v = input.value;
+      if (!v) return;
+      e.preventDefault();
+      var m = COMPLETE.filter(function (c) { return c.indexOf(v) === 0 && c !== v; });
+      if (m.length === 1) input.value = m[0] + (/(show|open|cat|theme)$/.test(m[0]) ? ' ' : '');
+      else if (m.length > 1) {
+        var pre = m.reduce(function (a, b) { var i = 0; while (i < a.length && a[i] === b[i]) i++; return a.slice(0, i); });
+        if (pre.length > v.length) input.value = pre;
+        else { echo(v); screen.append(cols(m.map(function (x) { return x; }))); }
+      }
+    }
+    else if (e.key === 'l' && e.ctrlKey) { e.preventDefault(); screen.textContent = ''; }
+  });
+
+  // Click on empty terminal space focuses the prompt (but not when selecting text or clicking links/buttons).
+  body.addEventListener('click', function (e) {
+    if (e.target.closest('a, button, input')) return;
+    var sel = window.getSelection && window.getSelection();
+    if (sel && String(sel).length) return;
+    input.focus({ preventScroll: true });
+  });
+
+  // ---- Light / dark switch (dark by default, remembered per visitor) ----
+  var root = document.documentElement, btn = document.getElementById('mode'), lab = document.getElementById('mode-label');
+  function setMode(mode, save) {
+    if (mode === 'light') root.setAttribute('data-term', 'light'); else root.removeAttribute('data-term');
+    lab.textContent = mode === 'light' ? 'dark' : 'light';
+    btn.setAttribute('aria-label', 'Switch to ' + (mode === 'light' ? 'dark' : 'light') + ' mode');
+    if (save) { try { localStorage.setItem('term-mode', mode); } catch (e) {} }
+  }
+  var saved = null;
+  try { saved = localStorage.getItem('term-mode'); } catch (e) {}
+  setMode(saved === 'light' ? 'light' : 'dark');
+  btn.addEventListener('click', function () { setMode(root.getAttribute('data-term') === 'light' ? 'dark' : 'light', true); });
+
+  // ---- Opening session: the page reads fine without typing anything ----
+  ['whoami', 'cat about.txt', 'ls -l links/', 'git log'].forEach(function (c) { run(c); });
+
+  function openFromHash() {
+    var sha = (location.hash || '').slice(1);
+    if (!/^[0-9a-f]{7}$/.test(sha)) return;
+    var b = screen.querySelector('.commit-btn[data-sha="' + sha + '"]');
+    if (!b) { run('git log --all'); b = screen.querySelectorAll('.commit-btn[data-sha="' + sha + '"]'); b = b[b.length - 1]; }
+    if (b) { toggle(b, document.getElementById(b.getAttribute('aria-controls')), true, true); b.scrollIntoView({ block: 'center' }); }
+  }
+  openFromHash();
+  window.addEventListener('hashchange', openFromHash);
+})();
+</script>
+</body>
+</html>
